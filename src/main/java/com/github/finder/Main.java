@@ -2,7 +2,15 @@ package com.github.finder;
 
 public class Main{
     public Main(String[] arguments){
-	this.parseArguments(arguments);
+	Args args = this.parseArguments(arguments);
+
+	Finder finder = new Finder(args);
+        for(String base: args){
+            String[] items = finder.find(base);
+            for(String item: items){
+                System.out.println(item);
+            }
+        }
     }
 
     public static void main(String[] args){
