@@ -3,6 +3,8 @@ package com.github.finder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 public class Finder {
     private Args args;
@@ -27,6 +29,14 @@ public class Finder {
 	if(args.getType() != null){
             flag &= checkTargetType(file, args.getType());
         }
+	if(args.getSize() != null){
+            flag &= checkTargetSize(file, args.getSize());
+        }
+	if(args.getGrep() != null){
+            flag &= checkGrep(file, args.getGrep());
+        }
+
+
         return flag;
     }
 
@@ -56,6 +66,40 @@ public class Finder {
         }
         else if(type.equals("h") || type.equals("hidden")){
             return file.isHidden();
+        }
+        return false;
+    }
+
+    private boolean checkTargetSize(File file, String sizeString){
+        if(file.isFile()){
+            char sign = sizeString.charAt(0);
+            String string = sizeString.substring(1);
+            int size = Integer.parseInt(string);
+
+            switch(sign){
+            case '>':
+                return file.length() > size;
+            case '<':
+                return file.length() < size;
+            case '=':
+                return file.length() == size;
+            default:
+                // ignore
+            }
+        }
+        return false;
+    }
+
+    private boolean checkGrep(File file, String pattern){
+        if(file.isFile()){
+            try(BufferedReader in = new BufferedReader(new FileReader(file))){
+                String line;
+                while((line = in.readLine()) != null){
+                    if(line.indexOf(pattern) >= 0){
+                        return true;
+                    }
+                }
+            }
         }
         return false;
     }
